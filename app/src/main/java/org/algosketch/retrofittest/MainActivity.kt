@@ -16,10 +16,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        getMemo()
+//        getMemoWithCallAsync()
+//        getMemoWithCallSync()
     }
 
-    fun getMemo() {
+    fun getMemoWithCallAsync() {
         val service = getRetrofitService(CallService::class.java)
         val call = service.getMemo(1)
         call.enqueue(object : retrofit2.Callback<Memo> {
@@ -38,6 +39,26 @@ class MainActivity : AppCompatActivity() {
                 t.printStackTrace()
             }
         })
+    }
+
+    fun getMemoWithCallSync() {
+        val service = getRetrofitService(CallService::class.java)
+        val call = service.getMemo(1)
+
+        /**
+         * Main Thread 에서 사용하면 Exception 발생.
+         */
+        Thread {
+            val result = call.execute()
+
+            if(result.isSuccessful) {
+                Log.d(tag, "스레드 + 동기를 이용한 Retrofit 사용 방법")
+                Log.d(tag, "${result.body()?.toString()}")
+            }
+            else {
+                Log.e(tag, "onResponse, status : ${result.code()}, message : ${result.message()}")
+            }
+        }.start()
     }
 
     fun <T> getRetrofitService(service: Class<T>) : T = RetrofitFactory.createRetrofitService(service)
