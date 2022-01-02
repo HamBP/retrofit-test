@@ -1,28 +1,40 @@
-package org.algosketch.retrofittest
+package org.algosketch.retrofittest.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
+import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.algosketch.androidtemplate.data.model.Memo
+import org.algosketch.retrofittest.R
 import org.algosketch.retrofittest.call.CallResponseService
 import org.algosketch.retrofittest.call.CallService
+import org.algosketch.retrofittest.databinding.ActivityMainBinding
 import org.algosketch.retrofittest.factory.RetrofitFactory
 import retrofit2.Call
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels()
     val tag = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        initDataBinding()
 
 //        getMemoWithCallAsync()
 //        getMemoWithCallSync()
         getMemoWithResponse()
+    }
+
+    fun initDataBinding() {
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
     }
 
     fun getMemoWithCallAsync() {
