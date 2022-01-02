@@ -3,7 +3,11 @@ package org.algosketch.retrofittest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.algosketch.androidtemplate.data.model.Memo
+import org.algosketch.retrofittest.call.CallResponseService
 import org.algosketch.retrofittest.call.CallService
 import org.algosketch.retrofittest.factory.RetrofitFactory
 import retrofit2.Call
@@ -18,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
 //        getMemoWithCallAsync()
 //        getMemoWithCallSync()
+        getMemoWithResponse()
     }
 
     fun getMemoWithCallAsync() {
@@ -59,6 +64,22 @@ class MainActivity : AppCompatActivity() {
                 Log.e(tag, "onResponse, status : ${result.code()}, message : ${result.message()}")
             }
         }.start()
+    }
+
+    fun getMemoWithResponse() {
+        val service = getRetrofitService(CallResponseService::class.java)
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val response = service.getMemo(1)
+
+            if(response.isSuccessful) {
+                Log.d(tag, "suspend function 과 코루틴 이용")
+                Log.d(tag, "${response.body()?.toString()}")
+            }
+            else {
+                Log.e(tag, "onResponse, status : ${response.code()}, message : ${response.message()}")
+            }
+        }
     }
 
     fun <T> getRetrofitService(service: Class<T>) : T = RetrofitFactory.createRetrofitService(service)
