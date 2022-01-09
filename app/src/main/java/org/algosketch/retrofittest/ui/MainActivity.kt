@@ -7,7 +7,9 @@ import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import org.algosketch.androidtemplate.data.model.Memo
 import org.algosketch.retrofittest.R
 import org.algosketch.retrofittest.call.CallResponseService
@@ -29,7 +31,10 @@ class MainActivity : AppCompatActivity() {
 
 //        getMemoWithCallAsync()
 //        getMemoWithCallSync()
-        getMemoWithResponse()
+//        getMemoWithResponse()
+        CoroutineScope(Dispatchers.Main).launch {
+            getMemoWithAwait()
+        }
     }
 
     fun initDataBinding() {
@@ -92,6 +97,17 @@ class MainActivity : AppCompatActivity() {
                 Log.e(tag, "onResponse, status : ${response.code()}, message : ${response.message()}")
             }
         }
+    }
+
+    suspend fun getMemoWithAwait() {
+        val service = getRetrofitService(CallResponseService::class.java)
+        val deferred = CoroutineScope(Dispatchers.IO).async {
+            service.getMemo(1)
+        }
+
+        val result = deferred.await()
+
+        Log.d(tag, result.body().toString())
     }
 
     fun <T> getRetrofitService(service: Class<T>) : T = RetrofitFactory.createRetrofitService(service)
