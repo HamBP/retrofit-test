@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.Dispatcher
 import org.algosketch.androidtemplate.data.model.Memo
 import org.algosketch.retrofittest.R
@@ -32,8 +29,14 @@ class MainActivity : AppCompatActivity() {
 //        getMemoWithCallAsync()
 //        getMemoWithCallSync()
 //        getMemoWithResponse()
+//        CoroutineScope(Dispatchers.Main).launch {
+//            getMemoWithAwait()
+//        }
         CoroutineScope(Dispatchers.Main).launch {
-            getMemoWithAwait()
+            val result = fetchMemo()
+            if(result.isSuccessful) {
+                Log.d(tag, result.body().toString())
+            }
         }
     }
 
@@ -108,6 +111,12 @@ class MainActivity : AppCompatActivity() {
         val result = deferred.await()
 
         Log.d(tag, result.body().toString())
+    }
+
+    suspend fun fetchMemo() = coroutineScope {
+        val service = getRetrofitService(CallResponseService::class.java)
+
+        service.getMemo(1)
     }
 
     fun <T> getRetrofitService(service: Class<T>) : T = RetrofitFactory.createRetrofitService(service)
