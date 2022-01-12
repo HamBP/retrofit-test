@@ -30,10 +30,10 @@ class MainActivity : AppCompatActivity() {
 //        getMemoWithCallAsync()
 //        getMemoWithCallSync()
 //        getMemoWithResponse()
-//        CoroutineScope(Dispatchers.Main).launch {
-//            getMemoWithAwait()
-//        }
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
+            getMemoWithAwait()
+        }
+        CoroutineScope(Dispatchers.IO).launch {
             val result = fetchMemo()
             if(result.isSuccessful) {
                 Log.d(tag, result.body().toString())
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     fun getMemoWithResponse() {
         val service = getRetrofitService(CallResponseService::class.java)
 
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val response = service.getMemo(1)
 
             if(response.isSuccessful) {
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     suspend fun fetchMemo() = coroutineScope {
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             val service = getRetrofitService(CallResponseService::class.java)
 
             service.getMemo(1)
