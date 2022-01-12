@@ -9,7 +9,7 @@ object OkHttp3Util {
     private val client = OkHttpClient()
 
     fun createClientWithLogInterceptor() : OkHttpClient {
-        return OkHttpClient.Builder().addInterceptor(LogInterceptor.createLogInterceptor()).build()
+        return OkHttpClient.Builder().addInterceptor(LogInterceptor.createCustomLogInterceptor()).build()
     }
 
     fun request() {
