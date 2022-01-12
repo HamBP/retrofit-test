@@ -12,6 +12,7 @@ import org.algosketch.retrofittest.R
 import org.algosketch.retrofittest.call.CallResponseService
 import org.algosketch.retrofittest.call.CallService
 import org.algosketch.retrofittest.databinding.ActivityMainBinding
+import org.algosketch.retrofittest.factory.OkHttp3Util
 import org.algosketch.retrofittest.factory.RetrofitFactory
 import retrofit2.Call
 import retrofit2.Response
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(tag, result.body().toString())
             }
         }
+        //OkHttp3Util.request()
     }
 
     fun initDataBinding() {
@@ -114,9 +116,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     suspend fun fetchMemo() = coroutineScope {
-        val service = getRetrofitService(CallResponseService::class.java)
+        withContext(Dispatchers.Default) {
+            val service = getRetrofitService(CallResponseService::class.java)
 
-        service.getMemo(1)
+            service.getMemo(1)
+        }
+    }
+
+    fun requestWithHttp3() {
+
     }
 
     fun <T> getRetrofitService(service: Class<T>) : T = RetrofitFactory.createRetrofitService(service)

@@ -10,6 +10,7 @@ object RetrofitFactory {
     fun <T> createRetrofitService(service: Class<T>): T {
         return Retrofit.Builder()
             .baseUrl(ServerConfig.baseUrl)
+            .client(OkHttp3Util.createClientWithLogInterceptor())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(service)
