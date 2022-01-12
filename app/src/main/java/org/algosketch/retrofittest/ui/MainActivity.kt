@@ -30,10 +30,10 @@ class MainActivity : AppCompatActivity() {
 //        getMemoWithCallAsync()
 //        getMemoWithCallSync()
 //        getMemoWithResponse()
-        CoroutineScope(Dispatchers.IO).launch {
-            getMemoWithAwait()
-        }
-        CoroutineScope(Dispatchers.IO).launch {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            getMemoWithAwait()
+//        }
+        CoroutineScope(Dispatchers.Main).launch {
             val result = fetchMemo()
             if(result.isSuccessful) {
                 Log.d(tag, result.body().toString())
@@ -115,16 +115,25 @@ class MainActivity : AppCompatActivity() {
         Log.d(tag, result.body().toString())
     }
 
-    suspend fun fetchMemo() = coroutineScope {
-        withContext(Dispatchers.IO) {
-            val service = getRetrofitService(CallResponseService::class.java)
+    suspend fun fetchMemo() = withContext(Dispatchers.IO) {
+        val service = getRetrofitService(CallResponseService::class.java)
 
-            service.getMemo(1)
-        }
+        service.getMemo(1)
     }
 
-    fun requestWithHttp3() {
+    suspend fun fetchAndDisplay() {
+        val service = getRetrofitService(CallResponseService::class.java)
 
+        coroutineScope {
+            // UI 와 관련된 데이터를 얻는다.
+            val memo = async(Dispatchers.IO) { service.getMemo(1) }
+
+            withContext(Dispatchers.Main) {
+                // doSomeWork
+                val result = memo.await()
+                // 얻은 data 를 이용해 UI 에 뿌려준다.
+            }
+        }
     }
 
     fun <T> getRetrofitService(service: Class<T>) : T = RetrofitFactory.createRetrofitService(service)
